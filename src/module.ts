@@ -5,8 +5,9 @@ import express, { Application } from "express";
 import cors from "cors";
 import cookieSession from "cookie-session";
 import mongoose from "mongoose";
-import { errorHandler, JwtPayload } from "@shopp-app-hsn/common";
+import { errorHandler, currentUser, requireAuth } from "@shopp-app-hsn/common";
 import { authRouters } from "./auth/auth.routers";
+import { sellerRouters } from "./seller/seller.routes";
 
 export class AppModule {
   constructor(public app: Application) {
@@ -25,7 +26,9 @@ export class AppModule {
         secure: false,
       })
     );
+    app.use(currentUser(process.env.JWT_KEY!));
     app.use(authRouters);
+    app.use(requireAuth, sellerRouters);
     app.use(errorHandler);
   }
   async start() {
